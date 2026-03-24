@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediScan AI — Health Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #040b14;
+    --surface: rgba(255,255,255,0.03);
+    --surface-hover: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.08);
+    --border-glow: rgba(56,189,248,0.3);
+    --text: #e8f4f8;
+    --text-muted: rgba(232,244,248,0.5);
+    --text-dim: rgba(232,244,248,0.3);
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --danger: #f87171;
+    --warn: #fbbf24;
+    --grad1: linear-gradient(135deg, #0f2942 0%, #0d1f35 50%, #0a1628 100%);
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --glow: 0 0 40px rgba(56,189,248,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(56,189,248,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 80%, rgba(129,140,248,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(52,211,153,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grid overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    padding: 60px 0 40px;
+    text-align: center;
+    position: relative;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(56,189,248,0.1);
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    animation: fadeSlideDown 0.6s ease both;
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #e8f4f8 0%, #38bdf8 50%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    animation: fadeSlideDown 0.6s 0.1s ease both;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    font-weight: 300;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+    animation: fadeSlideDown 0.6s 0.2s ease both;
+  }
+
+  /* ─── UPLOAD CARD ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    box-shadow: var(--card-shadow);
+    padding: 32px;
+    margin-bottom: 20px;
+    animation: fadeSlideUp 0.6s 0.3s ease both;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .card:hover {
+    border-color: rgba(56,189,248,0.15);
+    box-shadow: var(--card-shadow), var(--glow);
+  }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  /* Drop Zone */
+  .drop-zone {
+    border: 1.5px dashed var(--border);
+    border-radius: 16px;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    background: rgba(255,255,255,0.01);
+  }
+
+  .drop-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(56,189,248,0.05), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(56,189,248,0.04);
+    box-shadow: 0 0 0 4px rgba(56,189,248,0.06);
+    transform: translateY(-1px);
+  }
+
+  .drop-zone:hover::before, .drop-zone.dragover::before { opacity: 1; }
+
+  .drop-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(129,140,248,0.15));
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .drop-zone:hover .drop-icon {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 8px 24px rgba(56,189,248,0.2);
+  }
+
+  .drop-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .drop-sub {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .drop-sub span {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .drop-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .chip {
+    font-size: 0.72rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  #fileInput { display: none; }
+
+  /* Preview */
+  #previewWrap {
+    display: none;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    animation: fadeIn 0.4s ease;
+  }
+
+  #previewWrap img {
+    width: 100%;
+    max-height: 340px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .preview-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(4,11,20,0.8) 0%, transparent 50%);
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+  }
+
+  .preview-filename {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .preview-change {
+    margin-left: auto;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .preview-change:hover { background: rgba(255,255,255,0.18); }
+
+  /* ─── ANALYZE BUTTON ─── */
+  .btn-analyze {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    border: none;
+    border-radius: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    margin-top: 16px;
+    box-shadow: 0 4px 20px rgba(14,165,233,0.3);
+  }
+
+  .btn-analyze::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .btn-analyze:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(14,165,233,0.45);
+  }
+
+  .btn-analyze:hover::before { opacity: 1; }
+  .btn-analyze:active { transform: translateY(0); }
+  .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* Loading */
+  .loading-wrap {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  .spinner-ring {
+    width: 56px; height: 56px;
+    border: 2px solid rgba(56,189,248,0.1);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .loading-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .loading-dots span {
+    display: inline-block;
+    animation: blink 1.2s infinite;
+    font-size: 1.2rem;
+    color: var(--accent);
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ─── RESULTS ─── */
+  #resultsSection { display: none; }
+
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .results-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .results-time {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+  }
+
+  /* Findings grid */
+  .findings-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .finding-row {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    animation: fadeSlideUp 0.4s ease both;
+  }
+
+  .finding-row:nth-child(1) { animation-delay: 0.05s; }
+  .finding-row:nth-child(2) { animation-delay: 0.1s; }
+  .finding-row:nth-child(3) { animation-delay: 0.15s; }
+
+  .finding-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .finding-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .finding-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .bar-track {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    width: 0%;
+    transition: width 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .bar-green { background: linear-gradient(90deg, #059669, #34d399); }
+  .bar-yellow { background: linear-gradient(90deg, #d97706, #fbbf24); }
+  .bar-red { background: linear-gradient(90deg, #dc2626, #f87171); }
+
+  .color-green { color: #34d399; }
+  .color-yellow { color: #fbbf24; }
+  .color-red { color: #f87171; }
+
+  /* Confidence meter */
+  .confidence-wrap {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .confidence-circle {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+  }
+
+  .conf-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+  .conf-track {
+    fill: none;
+    stroke: rgba(255,255,255,0.05);
+    stroke-width: 6;
+  }
+
+  .conf-fill {
+    fill: none;
+    stroke: url(#confGrad);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 251.2;
+    stroke-dashoffset: 251.2;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .conf-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .conf-pct {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .conf-text {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+  }
+
+  .confidence-info { flex: 1; min-width: 180px; }
+
+  .confidence-level {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .confidence-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Report sections */
+  .report-sections { display: grid; gap: 14px; }
+
+  .report-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    animation: fadeSlideUp 0.4s ease both;
+    transition: border-color 0.3s;
+  }
+
+  .report-section:hover { border-color: rgba(56,189,248,0.12); }
+
+  .report-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .report-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .icon-blue { background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.15); }
+  .icon-purple { background: rgba(129,140,248,0.12); border: 1px solid rgba(129,140,248,0.15); }
+  .icon-green { background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.15); }
+  .icon-yellow { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.15); }
+  .icon-red { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.15); }
+  .icon-cyan { background: rgba(34,211,238,0.12); border: 1px solid rgba(34,211,238,0.15); }
+
+  .report-section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.01em;
+  }
+
+  .report-section-body {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+
+  .report-section-body p { margin-bottom: 8px; }
+  .report-section-body p:last-child { margin-bottom: 0; }
+
+  /* Disclaimer */
+  .disclaimer {
+    background: rgba(248,113,113,0.05);
+    border: 1px solid rgba(248,113,113,0.15);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .disclaimer-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .disclaimer-text {
+    font-size: 0.83rem;
+    color: rgba(248,113,113,0.9);
+    line-height: 1.65;
+  }
+
+  .disclaimer-text strong {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  /* Reset */
+  .btn-reset {
+    width: 100%;
+    padding: 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.3s;
+    margin-top: 8px;
+  }
+
+  .btn-reset:hover {
+    border-color: rgba(56,189,248,0.3);
+    color: var(--accent);
+    background: rgba(56,189,248,0.04);
+  }
+
+  /* Error */
+  .error-toast {
+    display: none;
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 0.85rem;
+    color: var(--danger);
+    margin-top: 14px;
+    animation: fadeIn 0.3s ease;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 48px 0;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(56,189,248,0.4); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(56,189,248,0); }
+  }
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0; }
+    40% { opacity: 1; }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 600px) {
+    .card { padding: 22px; }
+    .drop-zone { padding: 32px 16px; }
+    .confidence-wrap { justify-content: center; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="badge">
+      <span class="badge-dot"></span>
+      AI-Powered Analysis
+    </div>
+    <h1>AI Health Assistant</h1>
+    <p class="subtitle">Upload any medical image for instant AI-powered clinical insights — X-rays, skin conditions, injuries & more.</p>
+  </header>
+
+  <!-- UPLOAD CARD -->
+  <div class="card" id="uploadCard">
+    <div class="section-label">Medical Image Upload</div>
+
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept="image/*,.pdf">
+      <div class="drop-icon">🩻</div>
+      <div class="drop-title">Drop your medical image here</div>
+      <p class="drop-sub">or <span>click to browse files</span> from your device</p>
+      <div class="drop-chips">
+        <span class="chip">X-Ray</span>
+        <span class="chip">MRI / CT Scan</span>
+        <span class="chip">Skin Condition</span>
+        <span class="chip">Wound / Injury</span>
+        <span class="chip">Medical Report</span>
+      </div>
+    </div>
+
+    <div id="previewWrap">
+      <img id="previewImg" src="" alt="Preview">
+      <div class="preview-overlay">
+        <div class="preview-filename">🖼 <span id="fileName">image.jpg</span></div>
+        <button class="preview-change" onclick="resetUpload()">Change</button>
+      </div>
+    </div>
+
+    <button class="btn-analyze" id="analyzeBtn" onclick="analyzeImage()">
+      ✦ Analyze Image
+    </button>
+
+    <div class="error-toast" id="errorToast">⚠ <span id="errorMsg">Something went wrong.</span></div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="card" id="loadingCard" style="display:none;">
+    <div class="loading-wrap" style="display:flex;">
+      <div class="spinner-ring"></div>
+      <div>
+        <div class="loading-text" id="loadingText">Analyzing with AI</div>
+        <div class="loading-dots"><span>·</span><span>·</span><span>·</span></div>
+      </div>
+      <div class="drop-sub" style="max-width:320px;">Processing your image through our clinical AI model. This may take a few seconds.</div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsSection">
+
+    <!-- Header row -->
+    <div class="results-header">
+      <div class="results-title">Analysis Report</div>
+      <div class="results-time" id="resultsTime"></div>
+    </div>
+
+    <!-- Top Findings -->
+    <div class="card">
+      <div class="section-label">Top Findings</div>
+      <div class="findings-grid" id="findingsGrid"></div>
+    </div>
+
+    <!-- Confidence -->
+    <div class="card">
+      <div class="section-label">Model Confidence</div>
+      <div class="confidence-wrap">
+        <div class="confidence-circle">
+          <svg class="conf-svg" viewBox="0 0 100 100">
+            <defs>
+              <linearGradient id="confGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#38bdf8"/>
+                <stop offset="100%" stop-color="#818cf8"/>
+              </linearGradient>
+            </defs>
+            <circle class="conf-track" cx="50" cy="50" r="40"/>
+            <circle class="conf-fill" id="confFill" cx="50" cy="50" r="40"/>
+          </svg>
+          <div class="conf-label">
+            <div class="conf-pct" id="confPct">0%</div>
+            <div class="conf-text">conf.</div>
+          </div>
+        </div>
+        <div class="confidence-info">
+          <div class="confidence-level" id="confLevel">—</div>
+          <div class="confidence-desc" id="confDesc">Calculating confidence from model output...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Report -->
+    <div class="card">
+      <div class="section-label">AI Medical Report</div>
+      <div class="report-sections" id="reportSections"></div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="card">
+      <div class="disclaimer">
+        <div class="disclaimer-icon">🚨</div>
+        <div class="disclaimer-text">
+          <strong>Medical Disclaimer</strong>
+          This is an AI-generated health insight and <strong>not a medical diagnosis</strong>. The analysis is intended for informational purposes only. Always consult a qualified, licensed healthcare professional before making any medical decisions.
+        </div>
+      </div>
+    </div>
+
+    <!-- Reset -->
+    <button class="btn-reset" onclick="fullReset()">↩ Start New Analysis</button>
+
+    <div style="height: 40px;"></div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>MediScan AI · For demo purposes only · Not a medical device</footer>
+
+<script>
+  const API_URL = 'http://localhost:5000/analyze';
+
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const previewWrap = document.getElementById('previewWrap');
+  const previewImg = document.getElementById('previewImg');
+  const fileName = document.getElementById('fileName');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const loadingCard = document.getElementById('loadingCard');
+  const resultsSection = document.getElementById('resultsSection');
+  const errorToast = document.getElementById('errorToast');
+  const errorMsg = document.getElementById('errorMsg');
+  const uploadCard = document.getElementById('uploadCard');
+
+  let selectedFile = null;
+
+  // ─── DROP ZONE ───
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
+
+  function handleFile(file) {
+    if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
+      showError('Please upload an image file (JPG, PNG, WEBP, etc.)');
+      return;
+    }
+    selectedFile = file;
+    fileName.textContent = file.name;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewImg.src = e.target.result;
+      dropZone.style.display = 'none';
+      previewWrap.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    hideError();
+  }
+
+  function resetUpload() {
+    selectedFile = null;
+    fileInput.value = '';
+    previewWrap.style.display = 'none';
+    dropZone.style.display = 'block';
+    hideError();
+  }
+
+  // ─── ANALYZE ───
+  async function analyzeImage() {
+    if (!selectedFile) {
+      showError('Please upload a medical image first.');
+      return;
+    }
+    hideError();
+
+    // Show loading
+    uploadCard.style.display = 'none';
+    loadingCard.style.display = 'block';
+    resultsSection.style.display = 'none';
+
+    // Cycle loading messages
+    const messages = [
+      'Analyzing with AI',
+      'Detecting patterns',
+      'Generating report',
+      'Almost ready'
+    ];
+    let mi = 0;
+    const loadingTextEl = document.getElementById('loadingText');
+    const msgInterval = setInterval(() => {
+      mi = (mi + 1) % messages.length;
+      loadingTextEl.textContent = messages[mi];
+    }, 1800);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+      const data = await response.json();
+      clearInterval(msgInterval);
+
+      if (!data.success) throw new Error(data.message || 'Analysis failed.');
+
+      renderResults(data);
+    } catch (err) {
+      clearInterval(msgInterval);
+      loadingCard.style.display = 'none';
+      uploadCard.style.display = 'block';
+      showError(err.message || 'Failed to connect to the AI server. Please try again.');
+    }
+  }
+
+  // ─── RENDER ───
+  function renderResults(data) {
+    loadingCard.style.display = 'none';
+
+    // Timestamp
+    const now = new Date();
+    document.getElementById('resultsTime').textContent =
+      'Analyzed at ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+    // Findings
+    const grid = document.getElementById('findingsGrid');
+    grid.innerHTML = '';
+    const findings = data.top_findings || [];
+    findings.forEach((f, i) => {
+      const pct = parseFloat(f.score || 0) * 100;
+      const colorClass = pct >= 70 ? 'bar-red' : pct >= 40 ? 'bar-yellow' : 'bar-green';
+      const textClass = pct >= 70 ? 'color-red' : pct >= 40 ? 'color-yellow' : 'color-green';
+      const row = document.createElement('div');
+      row.className = 'finding-row';
+      row.style.animationDelay = (i * 0.07) + 's';
+      row.innerHTML = `
+        <div class="finding-top">
+          <span class="finding-name">${f.name}</span>
+          <span class="finding-pct ${textClass}">${f.percent || pct.toFixed(0) + '%'}</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill ${colorClass}" data-width="${pct}%"></div>
+        </div>`;
+      grid.appendChild(row);
+    });
+
+    // Animate bars after render
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill').forEach(b => {
+        b.style.width = b.dataset.width;
+      });
+    }, 80);
+
+    // Confidence from top score
+    const topScore = findings.length ? (parseFloat(findings[0].score) * 100) : 72;
+    renderConfidence(topScore);
+
+    // Report
+    renderReport(data.ai_report || '');
+
+    // Show
+    resultsSection.style.display = 'block';
+    setTimeout(() => {
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  function renderConfidence(pct) {
+    const circumference = 251.2;
+    const offset = circumference - (pct / 100) * circumference;
+    const fill = document.getElementById('confFill');
+    const pctEl = document.getElementById('confPct');
+    const levelEl = document.getElementById('confLevel');
+    const descEl = document.getElementById('confDesc');
+
+    setTimeout(() => {
+      fill.style.strokeDashoffset = offset;
+      // Count up
+      let n = 0;
+      const target = Math.round(pct);
+      const step = target / 60;
+      const counter = setInterval(() => {
+        n = Math.min(n + step, target);
+        pctEl.textContent = Math.round(n) + '%';
+        if (n >= target) clearInterval(counter);
+      }, 16);
+    }, 200);
+
+    if (pct >= 75) {
+      levelEl.textContent = 'High Confidence';
+      levelEl.style.color = '#34d399';
+      descEl.textContent = 'The AI model has high confidence in its findings. Results are statistically reliable for reference.';
+    } else if (pct >= 50) {
+      levelEl.textContent = 'Moderate Confidence';
+      levelEl.style.color = '#fbbf24';
+      descEl.textContent = 'The model shows moderate confidence. Consider cross-referencing with a clinical professional.';
+    } else {
+      levelEl.textContent = 'Low Confidence';
+      levelEl.style.color = '#f87171';
+      descEl.textContent = 'Low confidence detected. Image quality or ambiguity may affect accuracy. Seek professional evaluation.';
+    }
+  }
+
+  const REPORT_SECTIONS = [
+    { key: 'summary',     icon: '📝', label: 'Summary',                color: 'icon-blue' },
+    { key: 'conditions',  icon: '🦠', label: 'Possible Conditions',     color: 'icon-purple' },
+    { key: 'severity',    icon: '⚠️', label: 'Severity Insight',        color: 'icon-yellow' },
+    { key: 'actions',     icon: '🩺', label: 'Recommended Actions',     color: 'icon-green' },
+    { key: 'prevention',  icon: '🛡️', label: 'Preventive Measures',     color: 'icon-cyan' },
+    { key: 'seek',        icon: '🚨', label: 'When to Seek Medical Help',color: 'icon-red' },
+  ];
+
+  function renderReport(rawText) {
+    const container = document.getElementById('reportSections');
+    container.innerHTML = '';
+
+    // Try to intelligently parse sections from raw text
+    const sections = parseReportSections(rawText);
+
+    REPORT_SECTIONS.forEach((def, i) => {
+      const content = sections[def.key] || '';
+      if (!content) return;
+
+      const div = document.createElement('div');
+      div.className = 'report-section';
+      div.style.animationDelay = (i * 0.06) + 's';
+
+      const paras = content.split(/\n+/).filter(p => p.trim()).map(p =>
+        `<p>${p.trim()}</p>`).join('');
+
+      div.innerHTML = `
+        <div class="report-section-header">
+          <div class="report-icon ${def.color}">${def.icon}</div>
+          <div class="report-section-title">${def.label}</div>
+        </div>
+        <div class="report-section-body">${paras || `<p>${content}</p>`}</div>`;
+      container.appendChild(div);
+    });
+
+    // If no structured sections found, show raw text in summary
+    if (!container.children.length) {
+      const div = document.createElement('div');
+      div.className = 'report-section';
+      const paras = rawText.split(/\n+/).filter(p => p.trim()).map(p =>
+        `<p>${p.trim()}</p>`).join('');
+      div.innerHTML = `
+        <div class="report-section-header">
+          <div class="report-icon icon-blue">📝</div>
+          <div class="report-section-title">AI Insights</div>
+        </div>
+        <div class="report-section-body">${paras || '<p>No report available.</p>'}</div>`;
+      container.appendChild(div);
+    }
+  }
+
+  function parseReportSections(text) {
+    const result = {};
+    if (!text) return result;
+
+    // Pattern: look for section headers in the text
+    const patterns = {
+      summary:    /(?:summary|overview|introduction)[:\-\s]*([\s\S]*?)(?=(?:possible condition|condition|severity|recommended|preventive|when to|$))/i,
+      conditions: /(?:possible condition|condition|diagnosis)[:\-\s]*([\s\S]*?)(?=(?:severity|recommended|preventive|when to|$))/i,
+      severity:   /(?:severity|risk level)[:\-\s]*([\s\S]*?)(?=(?:recommended|preventive|when to|$))/i,
+      actions:    /(?:recommended action|recommendation)[:\-\s]*([\s\S]*?)(?=(?:preventive|when to|$))/i,
+      prevention: /(?:preventive measure|prevention)[:\-\s]*([\s\S]*?)(?=(?:when to|$))/i,
+      seek:       /(?:when to seek|seek medical|emergency)[:\-\s]*([\s\S]*?)$/i,
+    };
+
+    let matched = false;
+    for (const [key, rx] of Object.entries(patterns)) {
+      const m = text.match(rx);
+      if (m && m[1] && m[1].trim().length > 10) {
+        result[key] = m[1].trim().substring(0, 600);
+        matched = true;
+      }
+    }
+
+    // Fallback: split text into 6 equal chunks for each section
+    if (!matched) {
+      const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim());
+      const chunk = Math.ceil(sentences.length / 6);
+      const keys = ['summary', 'conditions', 'severity', 'actions', 'prevention', 'seek'];
+      keys.forEach((k, i) => {
+        const slice = sentences.slice(i * chunk, (i + 1) * chunk).join(' ');
+        if (slice.trim()) result[k] = slice.trim();
+      });
+    }
+
+    return result;
+  }
+
+  // ─── RESET ───
+  function fullReset() {
+    selectedFile = null;
+    fileInput.value = '';
+    previewImg.src = '';
+    previewWrap.style.display = 'none';
+    dropZone.style.display = 'block';
+    uploadCard.style.display = 'block';
+    loadingCard.style.display = 'none';
+    resultsSection.style.display = 'none';
+    hideError();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ─── ERRORS ───
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorToast.style.display = 'flex';
+  }
+
+  function hideError() {
+    errorToast.style.display = 'none';
+  }
+</script>
+</body>
+</html>
